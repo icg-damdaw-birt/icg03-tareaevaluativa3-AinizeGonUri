@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Base de datos
+// - Desarrollo (UD3-4): SQLite (archivo local ./dev.db)
+// - Producción (UD5): PostgreSQL en Neon
+datasource db {
+  provider = "sqlite"  // Cambiar a "postgresql" en UD5
+}
+
+// Usuario del sistema (alumno con su videoteca personal)
+model User {
+  id        String   @id @default(cuid())  // ID único
+  email     String   @unique               // Email de login (único)
+  password  String                         // Hash bcrypt (nunca texto plano)
+  createdAt DateTime @default(now())       // Fecha de registro
+  updatedAt DateTime @updatedAt            // Última actualización
+
+  movies    Movie[]  // Películas de este usuario
+}
+
+// Película en la videoteca personal de un usuario
+model Movie {
+  id        String   @id @default(cuid())  // ID único
+  title     String                         // Título de la película
+  director  String                         // Director
+  year      Int                            // Año de estreno
+  posterUrl String?                        // URL del póster (opcional)
+  
+  // Campos que se añadirán en UD3:
+  // - isFavorite Boolean @default(false)  // Favoritos (UD3 - guiado)
+  // - rating     Int?     @default(0)     // Rating 0-5 (UD3 - ejercicio)
+  
+  createdAt DateTime @default(now())       // Cuándo se añadió
+  updatedAt DateTime @updatedAt            // Última modificación
+
+  // Relación: esta película pertenece a un usuario
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id])
+}
