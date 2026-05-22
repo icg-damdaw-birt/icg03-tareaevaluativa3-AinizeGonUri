@@ -1,4 +1,4 @@
-name: CI-CD API
+name: BACKEND CI
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Descargar repositorio
+      - name: Descargar codigo del repositorio
         uses: actions/checkout@v5
 
       - name: Configurar Node.js
@@ -20,9 +20,15 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      - name: Generar cliente Prisma
+        run: npx prisma generate
+        env: 
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Ejecutar tests
         run: npm test
         env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
   
   deploy:
